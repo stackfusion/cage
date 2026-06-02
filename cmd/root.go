@@ -10,8 +10,10 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "cage",
-	Short: "Safely work with untrusted projects via Lima VMs",
+	Use:           "cage",
+	Short:         "Safely work with untrusted projects via Lima VMs",
+	SilenceUsage:  true,
+	SilenceErrors: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return runDefault()
 	},
@@ -19,7 +21,15 @@ var rootCmd = &cobra.Command{
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		os.Exit(1)
+		type exiter interface{ ExitCode() int }
+
+		if exitErr, ok := err.(exiter); ok {
+			// Clean non-zero exit from a subprocess (e.g. Ctrl+C) — no message needed
+			os.Exit(exitErr.ExitCode())
+		}
+
+		// Real error — print it ourselves since cobra is silenced
+		ui.Die("%s", err)
 	}
 }
 

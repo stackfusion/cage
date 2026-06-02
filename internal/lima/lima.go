@@ -154,6 +154,13 @@ func run(name string, args ...string) (string, error) {
 	return stdout.String(), nil
 }
 
+// ExitError wraps a subprocess exit code so callers can distinguish a
+// clean non-zero exit (e.g. Ctrl+C → 130) from an unexpected error.
+type ExitError struct{ Code int }
+
+func (e *ExitError) Error() string { return fmt.Sprintf("exit status %d", e.Code) }
+func (e *ExitError) ExitCode() int { return e.Code }
+
 // runInteractive runs a command with stdin/stdout/stderr attached to the
 // terminal — used for limactl commands that need user interaction or live
 // output (create, start, stop, shell).
@@ -164,5 +171,13 @@ func runInteractive(name string, args ...string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	return cmd.Run()
+	if err := cmd.Run(); err != nil {
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			return &ExitError{Code: exitErr.ExitCode()}
+		}
+
+		return err
+	}
+
+	return nil
 }
