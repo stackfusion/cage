@@ -29,28 +29,20 @@ images:
   - location: https://cloud-images.ubuntu.com/releases/questing/release/ubuntu-25.10-server-cloudimg-arm64.img
     arch: aarch64
 
-# Mount only the caged project directory (read-write); nothing else.
 mounts:
   - location: "CAGE_MOUNT_HOST"
     mountPoint: "CAGE_MOUNT_VM"
     writable: true
 
+ssh:
+  forwardAgent: true
+
 provision:
   - mode: system
     script: |
       #!/bin/bash
-      apt-get update -y
-      apt-get install -y build-essential curl eza fish fzf git htop inotify-tools parallel ripgrep tmux
-
-  - mode: user
-    script: |
-      #!/bin/bash
-      curl -fsSL https://mise.run | sh
-      echo 'eval "$(~/.local/bin/mise activate bash)"' >> ~/.bashrc
-      echo "alias ls='eza --group-directories-first'" >> ~/.bashrc
-      echo "alias ll='eza -lah --group-directories-first'" >> ~/.bashrc
-      echo '[ -f ~/.bashrc ] && source ~/.bashrc' >> ~/.profile
-			sudo usermod --shell $(which fish) $(whoami)
+      apt update -y
+      apt install -y autoconf build-essential curl eza fish fop fzf git htop inotify-tools libncurses-dev libssl-dev libxml2-utils m4 parallel ripgrep tmux unixodbc-dev xsltproc
 `
 
 const rcMarker = "# cage shell integration"
