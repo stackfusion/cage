@@ -8,35 +8,42 @@ import (
 )
 
 var (
-	labelInfo    = color.New(color.FgCyan, color.Bold).Sprint("cage:")
-	labelSuccess = color.New(color.FgGreen, color.Bold).Sprint("cage:")
-	labelWarn    = color.New(color.FgYellow, color.Bold).Sprint("cage:")
-	labelError   = color.New(color.FgRed, color.Bold).Sprint("cage: error:")
-
-	bold = color.New(color.Bold).SprintFunc()
-	dim  = color.New(color.Faint).SprintFunc()
+	Cyan   = color.New(color.FgCyan, color.Bold).SprintFunc()
+	Green  = color.New(color.FgGreen, color.Bold).SprintFunc()
+	Yellow = color.New(color.FgYellow, color.Bold).SprintFunc()
+	Red    = color.New(color.FgRed, color.Bold).SprintFunc()
+	Bold   = color.New(color.Bold).SprintFunc()
+	Dim    = color.New(color.Faint).SprintFunc()
 )
 
+var (
+	labelInfo  = Cyan("cage:")
+	labelWarn  = Yellow("cage:")
+	labelOK    = Green("cage:")
+	labelError = Red("cage: error:")
+)
+
+func stderr(label, msg string) {
+	fmt.Fprintf(os.Stderr, "%s %s\n", label, msg)
+}
+
 func Info(format string, a ...any) {
-	fmt.Fprintf(os.Stderr, "%s %s\n", labelInfo, fmt.Sprintf(format, a...))
+	stderr(labelInfo, fmt.Sprintf(format, a...))
 }
 
 func Success(format string, a ...any) {
-	fmt.Fprintf(os.Stderr, "%s %s\n", labelSuccess, fmt.Sprintf(format, a...))
+	stderr(labelOK, fmt.Sprintf(format, a...))
 }
 
 func Warn(format string, a ...any) {
-	fmt.Fprintf(os.Stderr, "%s %s\n", labelWarn, fmt.Sprintf(format, a...))
+	stderr(labelWarn, fmt.Sprintf(format, a...))
 }
 
 func Die(format string, a ...any) {
-	fmt.Fprintf(os.Stderr, "%s %s\n", labelError, fmt.Sprintf(format, a...))
+	stderr(labelError, fmt.Sprintf(format, a...))
 
 	os.Exit(1)
 }
-
-func Bold(s string) string { return bold(s) }
-func Dim(s string) string  { return dim(s) }
 
 // Ask prints a styled prompt and reads a line from stdin.
 // Returns def if the user presses Enter without typing anything.
@@ -44,10 +51,10 @@ func Ask(prompt, def string) string {
 	hint := ""
 
 	if def != "" {
-		hint = " " + dim("["+def+"]")
+		hint = " " + Dim("["+def+"]")
 	}
 
-	fmt.Fprintf(os.Stderr, "%s %s%s: ", color.YellowString("?"), bold(prompt), hint)
+	fmt.Fprintf(os.Stderr, "%s %s%s: ", color.YellowString("?"), Bold(prompt), hint)
 
 	var answer string
 
@@ -69,7 +76,7 @@ func Confirm(prompt, def string) bool {
 		hint = "Y/n"
 	}
 
-	fmt.Fprintf(os.Stderr, "%s %s %s: ", color.YellowString("?"), bold(prompt), dim("["+hint+"]"))
+	fmt.Fprintf(os.Stderr, "%s %s %s: ", color.YellowString("?"), Bold(prompt), Dim("["+hint+"]"))
 
 	var answer string
 
