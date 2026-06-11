@@ -23,17 +23,49 @@ var chpwdCmd = &cobra.Command{
 	Use:    "chpwd",
 	Short:  "Check caged status on directory change (called by shell hook)",
 	Hidden: true,
-	// Use Run (not RunE) so errors are swallowed and exit code is always 0.
-	// chpwd must never interrupt the user's workflow.
 	Run: func(cmd *cobra.Command, args []string) {
+		// Run swallows any errors and exit code is always 0.
+		// chpwd must never interrupt the user's workflow.
 		_ = runChpwd()
+	},
+}
+
+var promptCmd = &cobra.Command{
+	Use:    "prompt",
+	Short:  "Check if in a caged directory or if VM is running (called by shell prompt)",
+	Hidden: true,
+	Run: func(cmd *cobra.Command, args []string) {
+		// Run swallows any errors and exit code is always 0.
+		// prompt must never interrupt the user's workflow.
+		_ = runPrompt()
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(hookCmd)
 	rootCmd.AddCommand(chpwdCmd)
+	rootCmd.AddCommand(promptCmd)
 }
+
+const zshHook = `
+# cage shell integration (zsh)
+_cage_chpwd() { cage chpwd 2>/dev/null || true; }
+autoload -Uz add-zsh-hook
+add-zsh-hook chpwd _cage_chpwd
+`
+
+const bashHook = `
+# cage shell integration (bash)
+_cage_prompt_command() { cage chpwd 2>/dev/null || true; }
+PROMPT_COMMAND="_cage_prompt_command${PROMPT_COMMAND:+;$PROMPT_COMMAND}"
+`
+
+const fishHook = `
+# cage shell integration (fish)
+function _cage_chpwd --on-variable PWD
+    cage chpwd
+end
+`
 
 func runHook(shell string) error {
 	switch shell {
@@ -50,8 +82,6 @@ func runHook(shell string) error {
 	return nil
 }
 
-// runChpwd is called by the shell on every cd. It must be fast and silent
-// when the directory is not caged.
 func runChpwd() error {
 	cwd, err := os.Getwd()
 
@@ -87,22 +117,29 @@ func runChpwd() error {
 	return nil
 }
 
-const zshHook = `
-# cage shell integration (zsh)
-_cage_chpwd() { cage chpwd 2>/dev/null || true; }
-autoload -Uz add-zsh-hook
-add-zsh-hook chpwd _cage_chpwd
-`
+func runPrompt() error {
+	cwd, err := os.Getwd()
 
-const bashHook = `
-# cage shell integration (bash)
-_cage_prompt_command() { cage chpwd 2>/dev/null || true; }
-PROMPT_COMMAND="_cage_prompt_command${PROMPT_COMMAND:+;$PROMPT_COMMAND}"
-`
+	if err != nil {
+		return nil // stay silent
+	}
 
-const fishHook = `
-# cage shell integration (fish)
-function _cage_chpwd --on-variable PWD
-    cage chpwd
-end
-`
+	cageDir := config.FindCageDir(cwd)
+
+	if cageDir == "" {
+		fmt.Print("uncaged")
+
+		return nil
+	}
+
+	name := config.VMName(cageDir)
+	running, _ := lima.IsRunning(name)
+
+	if running {
+		fmt.Print("running")
+	} else {
+		fmt.Print("stopped")
+	}
+
+	return nil
+}
