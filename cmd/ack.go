@@ -8,8 +8,8 @@ import (
 	"github.com/stackfusion/cage/internal/ui"
 )
 
-var acknowledgeCmd = &cobra.Command{
-	Use:     "acknowledge",
+var ackCmd = &cobra.Command{
+	Use:     "ack",
 	Aliases: []string{"ack"},
 	Short:   "Acknowledge the .cage file in the current directory",
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -18,7 +18,7 @@ var acknowledgeCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(acknowledgeCmd)
+	rootCmd.AddCommand(ackCmd)
 }
 
 func runAcknowledge() error {
