@@ -56,49 +56,33 @@ func runChpwd() error {
 	cwd, err := os.Getwd()
 
 	if err != nil {
-		return nil // stay silent on error
+		return nil
 	}
 
 	cageDir := config.FindCageDir(cwd)
 
 	if cageDir == "" {
-		return nil // not a caged directory
-	}
-
-	name := config.VMName(cageDir)
-	isChild := cageDir != cwd
-
-	// Already acknowledged and unchanged → show quiet one-line indicator
-	if config.IsAcknowledged(cageDir) {
-		running, _ := lima.IsRunning(name)
-
-		if running {
-			fmt.Fprintf(os.Stderr, "%s\n", ui.Dim("[✓ cage: "+name+"]"))
-		} else {
-			fmt.Fprintf(os.Stderr, "%s\n", ui.Dim("[⚠ cage: "+name+" — not running]"))
-		}
-
 		return nil
 	}
 
-	// Not yet acknowledged → loud banner
+	name := config.VMName(cageDir)
 	running, _ := lima.IsRunning(name)
-	fmt.Fprintln(os.Stderr, "")
 
-	if isChild {
-		ui.Warn("inside caged project %s (at %s)", ui.Bold(name), ui.Bold(cageDir))
+	if config.IsAcknowledged(cageDir) {
+		if running {
+			ui.Subtle("%s", ui.Dim("vm is running · `cage` to enter it"))
+		} else {
+			ui.Subtle("%s", ui.Dim("vm is stopped · `cage` to start & enter it"))
+		}
 	} else {
-		ui.Warn("caged directory — VM %s", ui.Bold(name))
+		if running {
+			ui.Info("caged directory, vm is %s", ui.Green("running"))
+			ui.Info("run %s to enter the VM, or %s to mute this banner", ui.Bold("`cage`"), ui.Bold("`cage ack`"))
+		} else {
+			ui.Warn("caged directory, vm is %s", ui.Red("stopped"))
+			ui.Warn("run %s to start and enter the VM, or %s to mute this banner", ui.Bold("`cage`"), ui.Bold("`cage ack`"))
+		}
 	}
-
-	if running {
-		ui.Info("run %s to enter the VM", ui.Bold("cage shell"))
-	} else {
-		ui.Info("VM is not running — run %s to start and enter it", ui.Bold("cage"))
-		ui.Info("run %s to suppress this banner", ui.Bold("cage acknowledge"))
-	}
-
-	fmt.Fprintln(os.Stderr, "")
 
 	return nil
 }

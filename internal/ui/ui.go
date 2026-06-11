@@ -17,14 +17,19 @@ var (
 )
 
 var (
-	labelInfo  = Cyan("cage:")
-	labelWarn  = Yellow("cage:")
-	labelOK    = Green("cage:")
-	labelError = Red("cage: error:")
+	labelSubtle = Dim("cage:")
+	labelInfo   = Cyan("cage:")
+	labelWarn   = Yellow("cage:")
+	labelOK     = Green("cage:")
+	labelError  = Red("cage: error:")
 )
 
 func stderr(label, msg string) {
 	fmt.Fprintf(os.Stderr, "%s %s\n", label, msg)
+}
+
+func Subtle(format string, a ...any) {
+	stderr(labelSubtle, fmt.Sprintf(format, a...))
 }
 
 func Info(format string, a ...any) {
