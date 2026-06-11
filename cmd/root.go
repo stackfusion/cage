@@ -11,7 +11,7 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:           "cage",
-	Short:         "Safely work with untrusted projects via Lima VMs",
+	Long:          "Lightweight CLI for creating and entering Linux virtual machines.\n\nRun code and its dependencies in a sandbox, use Zed or VS Code in remote mode for development, and keep your host safe — even from compromised packages.",
 	SilenceUsage:  true,
 	SilenceErrors: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
