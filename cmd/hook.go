@@ -49,14 +49,14 @@ func init() {
 
 const zshHook = `
 # cage shell integration (zsh)
-_cage_chpwd() { cage chpwd 2>/dev/null || true; }
+_cage_chpwd() { cage chpwd || true; }
 autoload -Uz add-zsh-hook
 add-zsh-hook chpwd _cage_chpwd
 `
 
 const bashHook = `
 # cage shell integration (bash)
-_cage_prompt_command() { cage chpwd 2>/dev/null || true; }
+_cage_prompt_command() { cage chpwd || true; }
 PROMPT_COMMAND="_cage_prompt_command${PROMPT_COMMAND:+;$PROMPT_COMMAND}"
 `
 
