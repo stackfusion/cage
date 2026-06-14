@@ -45,6 +45,23 @@ changelog:
       - Merge pull request
       - Merge branch
 
+brews:
+  - name: cage
+    repository:
+      owner: stackfusion
+      name: homebrew-tap
+      token: "{{ .Env.GITHUB_TOKEN }}"
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    homepage: "https://github.com/stackfusion/cage"
+    description: "CLI tool for safely working with untrusted projects on macOS by isolating them in virtual machines"
+    license: "MIT"
+    install: |
+      bin.install "cage"
+    test: |
+      system "#{bin}/cage --version"
+
 release:
   footer: >-
 
