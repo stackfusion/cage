@@ -18,15 +18,17 @@ _The name and principle are inspired by FreeBSD's `jail`._
 - Shell hook detects caged directory entry and reminds to stay inside VM.
 - Zed and VS Code editors connect via SSH remote; language servers, deps, terminals, and tasks run inside VM.
 
-## Prerequisites
+## Installation
 
 ```shell
 brew install lima
+brew tap stackfusion/tap
+brew install cage
 ```
 
-## Setup
+You may also want to trust the `stackfusion/tap`: just follow the output from the `brew` command for more information.
 
-_TBA: how install the cage itself..._
+## Initialization
 
 ```shell
 cage install
