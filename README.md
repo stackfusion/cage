@@ -22,11 +22,10 @@ _The name and principle are inspired by FreeBSD's `jail`._
 
 ```shell
 brew install lima
-brew tap stackfusion/tap
-brew install cage
+brew install --cask stackfusion/tap/cage
 ```
 
-You may also want to trust the `stackfusion/tap`: just follow the output from the `brew` command for more information.
+When it's time to update Cage's version, you can run the `brew upgrade --cask stackfusion/tap/cage` command.
 
 ## Initialization
 
