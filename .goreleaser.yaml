@@ -45,7 +45,7 @@ changelog:
       - Merge pull request
       - Merge branch
 
-brews:
+homebrew_casks:
   - name: cage
     repository:
       owner: stackfusion
@@ -56,11 +56,14 @@ brews:
       email: bot@goreleaser.com
     homepage: "https://github.com/stackfusion/cage"
     description: "CLI tool for safely working with untrusted projects on macOS by isolating them in virtual machines"
-    license: "MIT"
-    install: |
-      bin.install "cage"
-    test: |
-      system "#{bin}/cage --version"
+    binaries:
+      - cage
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/cage"]
+          end
 
 release:
   footer: >-
