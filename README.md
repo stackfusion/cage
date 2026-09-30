@@ -10,7 +10,9 @@ _The name and principle are inspired by FreeBSD's `jail`._
 
 ## Features
 
-[![asciicast](https://asciinema.org/a/R2XWr5UcOgXulprq.svg)](https://asciinema.org/a/R2XWr5UcOgXulprq)
+<img width="1216" height="816" alt="cage" src="https://github.com/user-attachments/assets/a14e5643-7e69-46c5-b98e-0749bf8d7835" />
+
+Watch the [asciicast](https://asciinema.org/a/R2XWr5UcOgXulprq) for more.
 
 - Each project gets its own VM, provisioned on first boot (customizable script).
 - Only project directory mounted; no other host files available.
