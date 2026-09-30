@@ -24,9 +24,9 @@ memory: 8GiB
 disk: 40GiB
 
 images:
-  - location: https://cloud-images.ubuntu.com/releases/questing/release/ubuntu-25.10-server-cloudimg-amd64.img
+  - location: https://cloud-images.ubuntu.com/releases/resolute/release-20260720/ubuntu-26.04-server-cloudimg-amd64.img
     arch: x86_64
-  - location: https://cloud-images.ubuntu.com/releases/questing/release/ubuntu-25.10-server-cloudimg-arm64.img
+  - location: https://cloud-images.ubuntu.com/releases/resolute/release-20260720/ubuntu-26.04-server-cloudimg-arm64.img
     arch: aarch64
 
 mounts:
@@ -37,12 +37,27 @@ mounts:
 ssh:
   forwardAgent: true
 
+param:
+  internal_netplanOptional: true
+
 provision:
   - mode: system
     script: |
       #!/bin/bash
+      set -eux
       apt update -y
-      apt install -y autoconf build-essential curl eza fish fop fzf git htop inotify-tools libncurses-dev libssl-dev libxml2-utils m4 parallel ripgrep tmux unixodbc-dev xsltproc
+      apt install -y autoconf build-essential ca-certificates curl eza fish fop \
+                     fzf git gnupg htop inotify-tools jq libbz2-dev libffi-dev \
+                     libgdbm-dev liblzma-dev libncurses-dev libreadline-dev \
+                     libsqlite3-dev libssl-dev libxml2-utils libyaml-dev m4 \
+                     parallel pkg-config ripgrep tmux unixodbc-dev unzip wget \
+                     xsltproc zip zlib1g-dev
+  - mode: user
+    script: |
+      #!/bin/bash
+      set -eux
+      curl -fsSL https://mise.run | sh
+      echo "eval \"\$($HOME/.local/bin/mise activate bash)\"" >> ~/.bashrc
 `
 
 const rcMarker = "# cage shell integration"
